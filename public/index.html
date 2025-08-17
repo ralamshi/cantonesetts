@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>見字就讀 - 多語言文字轉語音工具</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FF8A80;
+            --secondary-color: #80D8FF;
+            --accent-color: #81C784;
+            --warning-color: #FFB74D;
+            --bg-color: #FFF8E1;
+            --card-bg: #FFFFFF;
+            --text-color: #424242;
+            --light-text-color: #757575;
+            --border-color: #EEEEEE;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.08);
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', 'Klee One', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-family: 'Klee One', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--light-text-color);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card h2 {
+            font-family: 'Klee One', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2 img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Language Tabs */
+        .language-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .language-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .language-tab:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .language-tab.active {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .language-tab img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Text Input */
+        .text-input-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .main-textarea {
+            width: 100%;
+            height: 200px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 1.1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .main-textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(128, 216, 255, 0.3);
+        }
+
+        /* 隱藏翻譯按鈕 */
+        .translate-btn {
+            display: none !important;
+        }
+
+        /* Magic Buttons */
+        .magic-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .magic-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .magic-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .magic-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .magic-btn img {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Voice Selection */
+        .voice-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .engine-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .engine-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .engine-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .engine-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .engine-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 隱藏 AI TTS 引擎 */
+        .engine-btn[data-engine="openai"] {
+            display: none !important;
+        }
+
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .voice-option {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* 添加 emoji 頭像樣式 */
+        .voice-option .emoji-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto;
+        }
+
+        .voice-option:hover .emoji-avatar {
+            transform: scale(1.1);
+        }
+
+        .voice-option.selected .emoji-avatar {
+            border-color: var(--primary-color);
+            transform: scale(1.15);
+            background: linear-gradient(135deg, var(--primary-color), #ffb4a2);
+        }
+
+        .voice-option:hover img {
+            transform: scale(1.1);
+        }
+
+        .voice-option.selected img {
+            border-color: var(--primary-color);
+            transform: scale(1.15);
+        }
+
+        .voice-option p {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--light-text-color);
+        }
+
+        .voice-option.selected p {
+            color: var(--text-color);
+        }
+
+        /* Advanced Controls */
+        .advanced-controls {
+            margin-bottom: 1.5rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .controls-grid label {
+            font-weight: 600;
+        }
+
+        .controls-grid span {
+            font-weight: 700;
+            color: var(--light-text-color);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-family: 'Klee One', cursive;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: var(--shadow);
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-btn:disabled {
+            background: #E0E0E0 !important;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .action-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .speak-btn {
+            background: linear-gradient(45deg, var(--primary-color), #ffb4a2);
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--secondary-color), #76D7C4);
+        }
+
+        /* Audio Player */
+        .audio-player {
+            background: var(--bg-color);
+            border-radius: 50px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .audio-player.show {
+            display: flex;
+        }
+
+        .play-pause-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .play-pause-btn img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .time-display {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--light-text-color);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* 隱藏翻譯相關區域 */
+        .translation-section {
+            display: none !important;
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tips */
+        .tips {
+            background: var(--bg-color);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--light-text-color);
+        }
+
+        .tips p {
+            margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer p {
+            color: var(--light-text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-textarea {
+                height: 150px;
+            }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .notification.success { background-color: #4CAF50; }
+        .notification.error { background-color: #F44336; }
+        .notification.warning { background-color: #FF9800; }
+        .notification.info { background-color: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="https://api.iconify.design/fluent-emoji-flat/speaking-head.svg" alt="Speaking Head Logo" class="logo">
+            <h1>見字就讀</h1>
+            <p>多語言智能語音合成工具</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Column: Input & Controls -->
+            <div class="card">
+                <h2>
+                    <img src="https://api.iconify.design/fluent-emoji-flat/writing-hand.svg" alt="Writing">
+                    文字輸入
+                </h2>
+
+                <!-- Language Tabs -->
+                <div class="language-tabs">
+                    <div class="language-tab active" data-lang="yue">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/speaking-head.svg" alt="Cantonese">
+                        廣東話
+                    </div>
+                    <div class="language-tab" data-lang="zh">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/speech-balloon.svg" alt="Mandarin">
+                        普通話
+                    </div>
+                    <div class="language-tab" data-lang="en">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/globe-with-meridians.svg" alt="English">
+                        English
+                    </div>
+                    <div class="language-tab" data-lang="ja">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/mount-fuji.svg" alt="Japanese">
+                        日本語
+                    </div>
+                    <div class="language-tab" data-lang="ko">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/cherry-blossom.svg" alt="Korean">
+                        한국어
+                    </div>
+                    <div class="language-tab" data-lang="de">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/pretzel.svg" alt="German">
+                        Deutsch
+                    </div>
+                </div>
+
+                <!-- Text Input -->
+                <div class="text-input-section">
+                    <div class="textarea-container">
+                        <textarea id="main-textarea" class="main-textarea" placeholder="在這裡輸入文字..."></textarea>
+                        <!-- 翻譯按鈕已隱藏 -->
+                        <button class="translate-btn" id="translate-btn" style="display: none;">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/globe-with-meridians.svg" alt="Translate">
+                            翻譯
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 翻譯結果區域已隱藏 -->
+                <div class="translation-section" id="translation-section" style="display: none !important;">
+                    <h3>
+                      <img src="https://api.iconify.design/fluent-emoji-flat/check-mark.svg" alt="Translated">
+                      翻譯結果
+                    </h3>
+                    <div class="translation-result" id="translation-result"></div>
+                    <div class="translation-hint">💡 點擊翻譯結果可將其放入文字框</div>
+                </div>
+
+                <!-- Magic Buttons -->
+                <div class="magic-section">
+                    <h3>魔法演繹：</h3>
+                    <div class="magic-buttons" id="magic-buttons">
+                        <div class="magic-btn" data-type="cardinal">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/input-numbers.svg" alt="Numbers">
+                            當數字讀
+                        </div>
+                        <div class="magic-btn" data-type="characters">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/input-latin-letters.svg" alt="Letters">
+                            逐個讀
+                        </div>
+                        <div class="magic-btn" data-type="ordinal">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/1st-place-medal.svg" alt="Ordinal">
+                            當序數讀
+                        </div>
+                        <div class="magic-btn" data-type="date">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/tear-off-calendar.svg" alt="Date">
+                            當日期讀
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="tips">
+                    <p>💡 <strong>小提示：</strong> 在文字中加入 <code>--</code> (短停頓) 或 <code>---</code> (長停頓) 來控制節奏！</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Voice & Settings -->
+            <div class="card">
+                <h2>
+                    <img src="https://api.iconify.design/fluent-emoji-flat/microphone.svg" alt="Voice">
+                    語音設定
+                </h2>
+
+                <!-- Engine Selection -->
+                <div class="voice-section">
+                    <h3>選擇語音引擎：</h3>
+                    <div class="engine-selector">
+                        <div class="engine-btn active" data-engine="google">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/cloud.svg" alt="Cloud TTS">
+                            Cloud TTS
+                        </div>
+                        <div class="engine-btn" data-engine="microsoft">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/brain.svg" alt="Neural TTS">
+                            Neural TTS
+                        </div>
+                        <!-- AI TTS 按鈕已隱藏 -->
+                        <div class="engine-btn" data-engine="openai" style="display: none !important;">
+                            <img src="https://api.iconify.design/fluent-emoji-flat/robot.svg" alt="AI TTS">
+                            AI TTS
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Selection -->
+                <div class="voice-section">
+                    <h3>選擇聲音：</h3>
+                    <div class="voice-grid" id="voice-grid">
+                        <!-- Voices will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Advanced Controls -->
+                <div class="advanced-controls">
+                    <h3>調音設定：</h3>
+                    <div class="controls-grid">
+                        <label for="rate-slider">語速</label>
+                        <input type="range" id="rate-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <span id="rate-value">1.0x</span>
+                        
+                        <label for="pitch-slider">音高</label>
+                        <input type="range" id="pitch-slider" min="-10.0" max="10.0" step="0.5" value="0">
+                        <span id="pitch-value">+0.0</span>
+                        
+                        <label for="volume-slider">音量</label>
+                        <input type="range" id="volume-slider" min="0.1" max="1.0" step="0.1" value="1.0">
+                        <span id="volume-value">100%</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn speak-btn" id="speak-btn">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/play-button.svg" alt="Play">
+                        收聽
+                    </button>
+                    <button class="action-btn download-btn" id="download-btn" disabled>
+                        <img src="https://api.iconify.design/fluent-emoji-flat/down-arrow.svg" alt="Download">
+                        下載
+                    </button>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="audio-player" id="audio-player">
+                    <button class="play-pause-btn" id="play-pause-btn">
+                        <img src="https://api.iconify.design/fluent-emoji-flat/play-button.svg" alt="Play">
+                    </button>
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="time-display" id="current-time">0:00</div>
+                    <div class="time-display">/</div>
+                    <div class="time-display" id="duration">0:00</div>
+                </div>
+
+                <audio id="audio-element"></audio>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p class="slogan">用心，講好每一句說話。</p>
+            <p class="credit">Made with ❤️ by LoveNSay.com</p>
+        </footer>
+    </div>
+
+    <script>
+        // App State
+        const state = {
+            currentLanguage: 'yue',
+            currentEngine: 'google',
+            selectedVoice: null,
+            lastAudioBase64: null,
+            isPlaying: false,
+            currentText: ''
+        };
+
+        // API Configuration
+        const API_CONFIG = {
+            baseURL: '/api/v1',
+            endpoints: {
+                synthesize: '/synthesize',
+                voices: '/voices'
+            }
+        };
+
+        const VOICE_DATABASE = {
+            google: {
+                yue: [
+                    { id: 'yue-HK-Standard-A', name: '曉美', avatar: '👩', gender: 'female' },
+                    { id: 'yue-HK-Standard-B', name: '家明', avatar: '👨', gender: 'male' },
+                    { id: 'yue-HK-Standard-C', name: '小晴', avatar: '👧', gender: 'female' },
+                    { id: 'yue-HK-Standard-D', name: '阿仔', avatar: '👦', gender: 'male' }
+                ],
+                en: [
+                    { id: 'en-US-Standard-C', name: 'Emma', avatar: '👩', gender: 'female' },
+                    { id: 'en-US-Standard-A', name: 'James', avatar: '👨', gender: 'male' },
+                    { id: 'en-US-Standard-E', name: 'Sophie', avatar: '👧', gender: 'female' },
+                    { id: 'en-US-Standard-D', name: 'David', avatar: '👦', gender: 'male' }
+                ],
+                ja: [
+                    { id: 'ja-JP-Standard-A', name: '麻衣', avatar: '👩', gender: 'female' },
+                    { id: 'ja-JP-Standard-C', name: '太郎', avatar: '👨', gender: 'male' }
+                ],
+                ko: [
+                    { id: 'ko-KR-Standard-A', name: '지은', avatar: '👩', gender: 'female' },
+                    { id: 'ko-KR-Standard-C', name: '민수', avatar: '👨', gender: 'male' }
+                ],
+                de: [
+                    { id: 'de-DE-Standard-G', name: 'Anna', avatar: '👩', gender: 'female' },
+                    { id: 'de-DE-Standard-H', name: 'Hans', avatar: '👨', gender: 'male' }
+                ]
+            },
+            microsoft: {
+                yue: [
+                    { id: 'zh-HK-HiuMaanNeural', name: '曉曼', avatar: '👩', gender: 'female' },
+                    { id: 'zh-HK-WanLungNeural', name: '雲龍', avatar: '👨', gender: 'male' },
+                    { id: 'zh-HK-HiuGaaiNeural', name: '曉佳', avatar: '👧', gender: 'female' }
+                ],
+                zh: [
+                    { id: 'zh-CN-XiaoxiaoNeural', name: '曉曉', avatar: '👩', gender: 'female' },
+                    { id: 'zh-CN-YunxiNeural', name: '雲希', avatar: '👨', gender: 'male' },
+                    { id: 'zh-CN-YunyangNeural', name: '雲揚', avatar: '👦', gender: 'male' },
+                    { id: 'zh-CN-XiaoyiNeural', name: '曉伊', avatar: '👧', gender: 'female' },
+                    { id: 'zh-CN-YunjianNeural', name: '雲健', avatar: '👨', gender: 'male' },
+                    { id: 'zh-CN-XiaochenNeural', name: '曉辰', avatar: '👩', gender: 'female' },
+                    { id: 'zh-CN-XiaohanNeural', name: '曉涵', avatar: '👩', gender: 'female' },
+                    { id: 'zh-CN-XiaomengNeural', name: '曉夢', avatar: '👧', gender: 'female' }
+                ],
+                en: [
+                    { id: 'en-US-AvaNeural', name: 'Ava', avatar: '👩', gender: 'female' },
+                    { id: 'en-US-AndrewNeural', name: 'Andrew', avatar: '👨', gender: 'male' },
+                    { id: 'en-US-EmmaNeural', name: 'Emma', avatar: '👧', gender: 'female' },
+                    { id: 'en-US-BrianNeural', name: 'Brian', avatar: '👦', gender: 'male' },
+                    { id: 'en-US-JennyNeural', name: 'Jenny', avatar: '👩', gender: 'female' },
+                    { id: 'en-US-GuyNeural', name: 'Guy', avatar: '👨', gender: 'male' },
+                    { id: 'en-US-AriaNeural', name: 'Aria', avatar: '👧', gender: 'female' },
+                    { id: 'en-US-DavisNeural', name: 'Davis', avatar: '👦', gender: 'male' }
+                ],
+                ja: [
+                    { id: 'ja-JP-NanamiNeural', name: '七海', avatar: '👩', gender: 'female' },
+                    { id: 'ja-JP-KeitaNeural', name: '啟太', avatar: '👨', gender: 'male' },
+                    { id: 'ja-JP-AoiNeural', name: '葵', avatar: '👧', gender: 'female' },
+                    { id: 'ja-JP-DaichiNeural', name: '大地', avatar: '👦', gender: 'male' },
+                    { id: 'ja-JP-MayuNeural', name: '真由', avatar: '👩', gender: 'female' },
+                    { id: 'ja-JP-NaokiNeural', name: '直樹', avatar: '👨', gender: 'male' }
+                ],
+                ko: [
+                    { id: 'ko-KR-SunHiNeural', name: '선희', avatar: '👩', gender: 'female' },
+                    { id: 'ko-KR-InJoonNeural', name: '인준', avatar: '👨', gender: 'male' },
+                    { id: 'ko-KR-JiMinNeural', name: '지민', avatar: '👧', gender: 'female' },
+                    { id: 'ko-KR-BongJinNeural', name: '봉진', avatar: '👦', gender: 'male' },
+                    { id: 'ko-KR-GookMinNeural', name: '국민', avatar: '👨', gender: 'male' },
+                    { id: 'ko-KR-YuJinNeural', name: '유진', avatar: '👩', gender: 'female' }
+                ],
+                de: [
+                    { id: 'de-DE-KatjaNeural', name: 'Katja', avatar: '👩', gender: 'female' },
+                    { id: 'de-DE-ConradNeural', name: 'Conrad', avatar: '👨', gender: 'male' },
+                    { id: 'de-DE-AmalaNeural', name: 'Amala', avatar: '👧', gender: 'female' },
+                    { id: 'de-DE-BerndNeural', name: 'Bernd', avatar: '👦', gender: 'male' },
+                    { id: 'de-DE-ChristelNeural', name: 'Christel', avatar: '👩', gender: 'female' },
+                    { id: 'de-DE-KillianNeural', name: 'Killian', avatar: '👨', gender: 'male' }
+                ]
+            }
+        };
+
+        // Language Configuration
+        const LANGUAGE_CONFIG = {
+            yue: { name: '廣東話', placeholder: '喺呢度打啲嘢... 例如：今日天氣好好呀！' },
+            zh: { name: '普通話', placeholder: '在这里输入文字... 例如：今天天气很好！' },
+            en: { name: 'English', placeholder: 'Type something here... e.g., Today is a beautiful day!' },
+            ja: { name: '日本語', placeholder: 'ここに文字を入力... 例：今日はいい天気ですね！' },
+            ko: { name: '한국어', placeholder: '여기에 텍스트를 입력하세요... 예: 오늘 날씨가 정말 좋네요!' },
+            de: { name: 'Deutsch', placeholder: 'Hier Text eingeben... z.B.: Das Wetter ist heute wirklich schön!' }
+        };
+
+        // DOM Elements
+        const elements = {
+            textarea: document.getElementById('main-textarea'),
+            languageTabs: document.querySelectorAll('.language-tab'),
+            engineBtns: document.querySelectorAll('.engine-btn'),
+            voiceGrid: document.getElementById('voice-grid'),
+            magicButtons: document.querySelectorAll('.magic-btn'),
+            speakBtn: document.getElementById('speak-btn'),
+            downloadBtn: document.getElementById('download-btn'),
+            rateSlider: document.getElementById('rate-slider'),
+            pitchSlider: document.getElementById('pitch-slider'),
+            volumeSlider: document.getElementById('volume-slider'),
+            rateValue: document.getElementById('rate-value'),
+            pitchValue: document.getElementById('pitch-value'),
+            volumeValue: document.getElementById('volume-value'),
+            audioPlayer: document.getElementById('audio-player'),
+            playPauseBtn: document.getElementById('play-pause-btn'),
+            progressContainer: document.getElementById('progress-container'),
+            progressBar: document.getElementById('progress-bar'),
+            currentTime: document.getElementById('current-time'),
+            duration: document.getElementById('duration'),
+            audioElement: document.getElementById('audio-element')
+        };
+
+        // Initialize App
+        function initializeApp() {
+            setupEventListeners();
+            updateLanguageInterface();
+            updateVoiceGrid();
+            updateSliderValues();
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Language Tabs
+            elements.languageTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const lang = tab.dataset.lang;
+                    if (lang !== state.currentLanguage) {
+                        changeLanguage(lang);
+                    }
+                });
+            });
+
+            // Engine Selection
+            elements.engineBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const engine = btn.dataset.engine;
+                    if (engine !== state.currentEngine && engine !== 'openai') { // 禁用 AI TTS
+                        changeEngine(engine);
+                    }
+                });
+            });
+
+            // Magic Buttons
+            elements.magicButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyMagic(btn.dataset.type);
+                });
+            });
+
+            // Speak Button
+            elements.speakBtn.addEventListener('click', handleSpeak);
+
+            // Download Button
+            elements.downloadBtn.addEventListener('click', handleDownload);
+
+            // Sliders
+            elements.rateSlider.addEventListener('input', updateSliderValues);
+            elements.pitchSlider.addEventListener('input', updateSliderValues);
+            elements.volumeSlider.addEventListener('input', updateSliderValues);
+
+            // Audio Player
+            elements.playPauseBtn.addEventListener('click', togglePlayPause);
+            elements.progressContainer.addEventListener('click', handleProgressClick);
+            elements.audioElement.addEventListener('timeupdate', updateProgress);
+            elements.audioElement.addEventListener('loadedmetadata', updateDuration);
+            elements.audioElement.addEventListener('play', () => updatePlayButton(true));
+            elements.audioElement.addEventListener('pause', () => updatePlayButton(false));
+            elements.audioElement.addEventListener('ended', () => {
+                state.isPlaying = false;
+                updatePlayButton(false);
+                elements.audioElement.currentTime = 0;
+                updateProgress();
+            });
+
+            // Textarea
+            elements.textarea.addEventListener('input', () => {
+                state.currentText = elements.textarea.value;
+            });
+        }
+
+        // Language Management
+        function changeLanguage(lang) {
+            state.currentLanguage = lang;
+            updateLanguageInterface();
+            updateVoiceGrid();
+        }
+
+        function updateLanguageInterface() {
+            elements.languageTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.lang === state.currentLanguage);
+            });
+
+            const config = LANGUAGE_CONFIG[state.currentLanguage];
+            elements.textarea.placeholder = config.placeholder;
+        }
+
+        // Engine Management
+        function changeEngine(engine) {
+            state.currentEngine = engine;
+            updateEngineInterface();
+            updateVoiceGrid();
+        }
+
+        function updateEngineInterface() {
+            elements.engineBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.engine === state.currentEngine);
+            });
+        }
+
+        // Voice Management
+        function updateVoiceGrid() {
+            const voices = VOICE_DATABASE[state.currentEngine]?.[state.currentLanguage] || [];
+            
+            elements.voiceGrid.innerHTML = '';
+            
+            if (voices.length === 0) {
+                elements.voiceGrid.innerHTML = '<p style="text-align: center; color: var(--light-text-color);">此語言暫未支援</p>';
+                state.selectedVoice = null;
+                return;
+            }
+
+            voices.forEach((voice, index) => {
+                const voiceElement = createVoiceElement(voice);
+                elements.voiceGrid.appendChild(voiceElement);
+                
+                // Select first voice by default
+                if (index === 0 && !state.selectedVoice) {
+                    selectVoice(voice, voiceElement);
+                }
+            });
+        }
+
+        function createVoiceElement(voice) {
+            const div = document.createElement('div');
+            div.className = 'voice-option';
+            div.dataset.voiceId = voice.id;
+            
+            // 檢查是否是 emoji 字符
+            const isEmoji = voice.avatar.length <= 4 && /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(voice.avatar);
+            
+            if (isEmoji) {
+                div.innerHTML = `
+                    <div class="emoji-avatar">${voice.avatar}</div>
+                    <p>${voice.name}</p>
+                `;
+            } else {
+                div.innerHTML = `
+                    <img src="${voice.avatar}" alt="${voice.name}">
+                    <p>${voice.name}</p>
+                `;
+            }
+            
+            div.addEventListener('click', () => selectVoice(voice, div));
+            return div;
+        }
+
+        function selectVoice(voice, element) {
+            elements.voiceGrid.querySelectorAll('.voice-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            state.selectedVoice = voice;
+        }
+
+        // Magic Functions
+        function applyMagic(type) {
+            const start = elements.textarea.selectionStart;
+            const end = elements.textarea.selectionEnd;
+            const selectedText = elements.textarea.value.substring(start, end);
+            
+            if (!selectedText) {
+                showNotification('請先選擇要施展魔法的文字！', 'warning');
+                return;
+            }
+            
+            let format = '';
+            if (type === 'date') {
+                if (selectedText.includes('-')) format = 'ymd';
+                else if (selectedText.includes('/')) format = 'mdy';
+            }
+            
+            const formatAttr = format ? ` format="${format}"` : '';
+            const wrappedText = `<say-as interpret-as="${type}"${formatAttr}>${selectedText}</say-as>`;
+            
+            const newText = elements.textarea.value.substring(0, start) + wrappedText + elements.textarea.value.substring(end);
+            elements.textarea.value = newText;
+            state.currentText = newText;
+            
+            const newCursorPos = start + wrappedText.length;
+            elements.textarea.setSelectionRange(newCursorPos, newCursorPos);
+            elements.textarea.focus();
+        }
+
+        // Speech Synthesis
+        async function handleSpeak() {
+            const text = elements.textarea.value.trim();
+            if (!text) {
+                showNotification('請先輸入要朗讀的文字！', 'warning');
+                return;
+            }
+
+            if (!state.selectedVoice) {
+                showNotification('請先選擇一個聲音！', 'warning');
+                return;
+            }
+
+            setLoadingState(elements.speakBtn, true, '合成中...');
+            elements.downloadBtn.disabled = true;
+            
+            // Stop current playback and reset player
+            elements.audioElement.pause();
+            elements.audioElement.currentTime = 0;
+            elements.audioPlayer.classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.synthesize}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        engine: state.currentEngine,
+                        text: text,
+                        voice: state.selectedVoice.id,
+                        language: state.currentLanguage,
+                        rate: parseFloat(elements.rateSlider.value),
+                        pitch: parseFloat(elements.pitchSlider.value),
+                        volume: parseFloat(elements.volumeSlider.value)
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '語音合成失敗');
+                }
+
+                const data = await response.json();
+                state.lastAudioBase64 = data.audioContent;
+                
+                // Set audio source and wait for loading
+                const audioSrc = `data:audio/mp3;base64,${state.lastAudioBase64}`;
+                elements.audioElement.src = audioSrc;
+                
+                // Wait for audio to load before playing
+                await new Promise((resolve, reject) => {
+                    elements.audioElement.onloadeddata = resolve;
+                    elements.audioElement.onerror = reject;
+                });
+                
+                await elements.audioElement.play();
+                
+                elements.downloadBtn.disabled = false;
+                elements.audioPlayer.classList.add('show');
+                
+                showNotification('語音合成成功！', 'success');
+                
+            } catch (error) {
+                console.error('Synthesis error:', error);
+                showNotification(`語音合成失敗：${error.message}`, 'error');
+            } finally {
+                setLoadingState(elements.speakBtn, false, '收聽');
+            }
+        }
+
+        // Download
+        function handleDownload() {
+            if (!state.lastAudioBase64) {
+                showNotification('沒有可下載的音頻文件', 'warning');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = `data:audio/mp3;base64,${state.lastAudioBase64}`;
+            link.download = `見字就讀_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.mp3`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('音頻文件下載中...', 'success');
+        }
+
+        // Audio Player Controls
+        function togglePlayPause() {
+            if (elements.audioElement.paused) {
+                elements.audioElement.play();
+            } else {
+                elements.audioElement.pause();
+            }
+        }
+
+        function updatePlayButton(isPlaying) {
+            const icon = isPlaying ? 'pause-button' : 'play-button';
+            const alt = isPlaying ? 'Pause' : 'Play';
+            elements.playPauseBtn.innerHTML = `<img src="https://api.iconify.design/fluent-emoji-flat/${icon}.svg" alt="${alt}">`;
+            state.isPlaying = isPlaying;
+        }
+
+        function updateProgress() {
+            if (elements.audioElement.duration) {
+                const percentage = (elements.audioElement.currentTime / elements.audioElement.duration) * 100;
+                elements.progressBar.style.width = `${percentage}%`;
+                elements.currentTime.textContent = formatTime(elements.audioElement.currentTime);
+            }
+        }
+
+        function updateDuration() {
+            elements.duration.textContent = formatTime(elements.audioElement.duration);
+        }
+
+        function handleProgressClick(e) {
+            const rect = elements.progressContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            elements.audioElement.currentTime = percentage * elements.audioElement.duration;
+        }
+
+        // Slider Updates
+        function updateSliderValues() {
+            elements.rateValue.textContent = `${parseFloat(elements.rateSlider.value).toFixed(1)}x`;
+            
+            const pitchValue = parseFloat(elements.pitchSlider.value);
+            elements.pitchValue.textContent = `${pitchValue >= 0 ? '+' : ''}${pitchValue.toFixed(1)}`;
+            
+            const volumeValue = Math.round(parseFloat(elements.volumeSlider.value) * 100);
+            elements.volumeValue.textContent = `${volumeValue}%`;
+        }
+
+        // Utility Functions
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function setLoadingState(button, isLoading, text) {
+            if (isLoading) {
+                button.disabled = true;
+                button.classList.add('loading');
+                const originalHTML = button.innerHTML;
+                button.dataset.originalHtml = originalHTML;
+                button.innerHTML = `<img src="https://api.iconify.design/line-md/loading-twotone-loop.svg" alt="Loading"> ${text}`;
+            } else {
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.innerHTML = button.dataset.originalHtml || button.innerHTML;
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

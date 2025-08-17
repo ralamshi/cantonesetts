@@ -1,0 +1,8 @@
+# 在 .gitignore 中添加
+node_modules/
+.env
+.env.local
+.env.development
+.env.production
+logs/
+*.log

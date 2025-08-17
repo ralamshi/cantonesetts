@@ -1,0 +1,59 @@
+{
+    "name": "lovensay-multilingual-tts",
+    "version": "2.0.0",
+    "description": "多語言智能語音合成工具 - 支援廣東話、普通話、英文、日文、韓文、德文",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "build": "npm run build:client",
+        "build:client": "echo 'Client already built'",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "lint": "eslint . --ext .js",
+        "lint:fix": "eslint . --ext .js --fix",
+        "logs:error": "tail -f logs/error.log",
+        "logs:combined": "tail -f logs/combined.log",
+        "health": "curl -f http://localhost:${PORT:-3001}/health || exit 1"
+    },
+    "keywords": [
+        "tts",
+        "text-to-speech",
+        "cantonese",
+        "multilingual",
+        "google-cloud",
+        "azure",
+        "openai",
+        "translation"
+    ],
+    "author": "LoveNSay.com",
+    "license": "MIT",
+    "engines": {
+        "node": ">=16.0.0",
+        "npm": ">=8.0.0"
+    },
+    "dependencies": {
+        "@google-cloud/text-to-speech": "^6.2.0",
+        "@google-cloud/translate": "^9.2.0",
+        "axios": "^1.11.0",
+        "compression": "^1.8.1",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "express-rate-limit": "^8.0.1",
+        "express-validator": "^7.2.1",
+        "helmet": "^8.1.0",
+        "isomorphic-dompurify": "^2.26.0",
+        "path-to-regexp": "^0.1.7",
+        "winston": "^3.17.0"
+    },
+    "devDependencies": {
+        "eslint": "^9.33.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-node": "^11.1.0",
+        "jest": "^30.0.5",
+        "nodemon": "^3.1.10",
+        "prettier": "^3.6.2",
+        "supertest": "^7.1.4"
+    }
+}
